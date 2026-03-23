@@ -1,6 +1,7 @@
 import torch
 import torch.optim as optim
 from tqdm import tqdm
+from src.evaluation import evaluate_fairness
 
 # def bpr_loss(pos_scores, neg_scores):
 
@@ -23,7 +24,7 @@ def bpr_loss(pos_scores, neg_scores, model, reg_lambda=1e-4):
 
     return loss + reg_lambda * reg_loss
 
-def train(model, adj, sampler, epochs=100, batch_size=2048, lr=1e-3):
+def train(model, adj, sampler, train_interactions, test_interactions, gender_dict, epochs=50, batch_size=128, lr=0.001):
 
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
@@ -53,3 +54,24 @@ def train(model, adj, sampler, epochs=100, batch_size=2048, lr=1e-3):
             total_loss += loss.item()
 
         print(f"Epoch {epoch+1}, Loss: {total_loss:.4f}")
+
+        # Evaluate every 5 epochs
+        if (epoch + 1) % 5 == 0:
+
+            print("Evaluating...")
+
+            recall, ndcg, male_r, female_r, gru = evaluate_fairness(
+                model,
+                adj,
+                train_interactions,
+                test_interactions,
+                gender_dict,
+                k=20
+            )
+
+            print(f"Recall@20: {recall:.4f}")
+            print(f"NDCG@20: {ndcg:.4f}")
+            print(f"Male Recall@20: {male_r:.4f}")
+            print(f"Female Recall@20: {female_r:.4f}")
+            print(f"GRU: {gru:.4f}")
+            print("-" * 50)
