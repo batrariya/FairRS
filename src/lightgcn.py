@@ -3,7 +3,7 @@ import torch.nn as nn
 
 class LightGCN(nn.Module):
 
-    def __init__(self, num_users, num_items, embedding_dim=128, n_layers=3):
+    def __init__(self, num_users, num_items, embedding_dim=64,n_layers=3):
         super().__init__()
 
         self.num_users = num_users
