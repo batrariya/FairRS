@@ -391,4 +391,22 @@ def compute_exposure_from_model(
                     else:
                         female_exposure[category] += 1
 
-        return male_exposure, female_exposure
+        # return male_exposure, female_exposure
+
+        # -------- Normalize --------
+        male_total = sum(male_exposure.values())
+        female_total = sum(female_exposure.values())
+
+        male_dist = {
+            k: v / male_total for k, v in male_exposure.items()
+        } if male_total > 0 else {k: 0 for k in all_genres}
+
+        female_dist = {
+            k: v / female_total for k, v in female_exposure.items()
+        } if female_total > 0 else {k: 0 for k in all_genres}
+
+        # sort for readability
+        male_dist = dict(sorted(male_dist.items()))
+        female_dist = dict(sorted(female_dist.items()))
+
+        return male_dist, female_dist
